@@ -5,4 +5,5 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
-docker build --build-arg token=$1 -t j0lama/oaiue:latest .
+#docker build --build-arg token=$1 -t j0lama/oaiue:latest .
+docker build --build-arg token=$1 -t iouliosp/oaiue:latest .

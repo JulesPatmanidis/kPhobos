@@ -6,7 +6,8 @@ RUN apt-get -y update
 RUN apt-get -y install net-tools iputils-ping git xxd nano
 
 ARG token
-RUN git clone https://j0lama:$token@github.com/j0lama/openairinterface5g.git
+RUN git clone https://JulesPatmanidis:$token@github.com/JulesPatmanidis/openairinterface5g_custom.git
+#RUN git clone https://j0lama:$token@github.com/j0lama/openairinterface5g.git
 
 WORKDIR openairinterface5g/
 RUN source oaienv

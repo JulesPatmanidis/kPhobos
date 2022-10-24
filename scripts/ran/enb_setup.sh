@@ -13,6 +13,7 @@ git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git
 
 cd openairinterface5g/
 # Change branch
+# git checkout github-lte-handover
 git checkout develop
 source oaienv
 cd cmake_targets/
