@@ -19,7 +19,8 @@ cd /local/repository
 
 # Clone proxy
 git clone https://JulesPatmanidis:$1@github.com/JulesPatmanidis/oai-lte-5g-proxy-ioulios.git
-cd proxy/
+cd oai-lte-5g-proxy-ioulios/
+#git checkout github-lte_handover
 
 # Compile proxy
 make
