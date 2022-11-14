@@ -91,7 +91,7 @@ midhaul.addInterface(iface2)
 # eNB 2
 enb2 = rspec.RawPC("enb2")
 enb2.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
-enb2.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/enb_setup.sh"))
+enb2.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/enb_setup2.sh"))
 enb2.hardware_type = params.Hardware
 enb2.Site('RAN')
 iface1 = enb2.addInterface()
