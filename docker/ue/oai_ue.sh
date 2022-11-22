@@ -21,4 +21,9 @@ sed -i "s/CUSTOM_MSIN/$(printf "%010d" $1)/g" tmp_sim.conf # Add the MSIN
 rm tmp_sim.conf
 
 num="$(($1-1))"
-./lte-uesoftmodem -O ue.conf --L2-emul 5 --nokrnmod 1 --node-number 2 --log_config.global_log_options level,nocolor,time,thread_id $num | tee ue.log 2>&1
+./lte-uesoftmodem -O ue.conf --L2-emul 5 --nokrnmod 1 --nsa --num-ues 2 --node-number 1 --num-enbs 2 --log_config.global_log_options level,nocolor,time,thread_id | tee ue.log 2>&1
+
+# node_id=2
+# sudo -E ./ran_build/build/lte-uesoftmodem -O ../ci-scripts/conf_files/episci/proxy_ue.nfapi.conf --L2-emul 5 \
+# --nokrnmod 1 --ue-idx-standalone $node_id --num-ues 1 --node-number $node_id --nsa \
+# --log_config.global_log_options level,nocolor,time,thread_id | tee ue_$node_id.log 2>&1
