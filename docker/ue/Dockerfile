@@ -39,6 +39,7 @@ WORKDIR ../
 RUN /bin/sh oaienv && \
     cd cmake_targets && \
     mkdir -p log && \
+    git pull && \
     ./build_oai -I --UE
 
 #RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC ./build_oai -I

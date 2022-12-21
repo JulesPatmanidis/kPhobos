@@ -5,6 +5,15 @@ if [ "$#" -ne 1 ]; then
     exit 1
 fi
 
+FILE=handover_table.txt
+if test -f "$FILE";
+then
+    echo "$FILE located"
+else
+    echo "$FILE does not exist, make sure to include it in the current directory"
+    exit 1
+fi
+
 cd ../../../
 source oaienv
 cd cmake_targets/ran_build/build/
