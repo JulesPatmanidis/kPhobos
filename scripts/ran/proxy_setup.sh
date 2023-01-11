@@ -18,9 +18,8 @@ sudo apt -y install libsctp-dev
 cd /local/repository
 
 # Clone proxy
-git clone https://JulesPatmanidis:$1@github.com/JulesPatmanidis/oai-lte-5g-proxy-ioulios.git
-cd oai-lte-5g-proxy-ioulios/
-git checkout github-lte_handover
+git clone https://JulesPatmanidis:$1@github.com/JulesPatmanidis/proxy_handover.git
+cd proxy_handover/
 
 # Compile proxy
 make
