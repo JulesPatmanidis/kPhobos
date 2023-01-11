@@ -18,8 +18,8 @@ sudo apt -y install libsctp-dev
 cd /local/repository
 
 # Clone proxy
-git clone https://JulesPatmanidis:$1@github.com/JulesPatmanidis/proxy_handover.git
-cd proxy_handover/
+git clone https://JulesPatmanidis:$1@github.com/JulesPatmanidis/proxy-handover.git
+cd proxy-handover/
 
 # Compile proxy
 make

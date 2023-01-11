@@ -10,7 +10,7 @@ if [ ! -f /local/repository/proxy-setup-complete ]; then
     exit 0
 fi
 
-cd /local/repository/oai-lte-5g-proxy-ioulios/build
+cd /local/repository/proxy-handover/build
 
 # ./proxy [options] [num_UEs] enb1_ip enb2_ip ...
 
