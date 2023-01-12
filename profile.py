@@ -83,7 +83,7 @@ for i in range(0, params.enbCount):
     iface1 = enb.addInterface()
     iface1.addAddress(PG.IPv4Address('192.168.1.' + str(i + 2), netmask))
     backhaul.addInterface(iface1)
-    iface2 = enb1.addInterface()
+    iface2 = enb.addInterface()
     iface2.addAddress(PG.IPv4Address('192.168.2.' + str(i + 2), netmask))
     midhaul.addInterface(iface2)
 
