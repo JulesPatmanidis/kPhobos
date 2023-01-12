@@ -47,7 +47,7 @@ sed -i "s/ENB_BACKHAUL_IP/$ENB_BACKHAUL_IP/g" /local/repository/config/ran/enb.c
 MIDHAUL_IFACE=$(ip route list 192.168.2.0/24 | awk '{print $3}')
 ENB_MIDHAUL_IP="192.168.2.$IP_OFFSET"
 
-sed -i "s/MIDHAUL/$MIDHAUL_IFACE/g" /local/repository/config/ran/enb.conf
+sed -i "s/MIDHAUL_IFACE/$MIDHAUL_IFACE/g" /local/repository/config/ran/enb.conf
 sed -i "s/ENB_MIDHAUL_IP/$ENB_MIDHAUL_IP/g" /local/repository/config/ran/enb.conf
 
 
