@@ -75,16 +75,16 @@ backhaul.addInterface(iface)
 
 
 for i in range(0, params.enbCount):
-    enb = rspec.RawPC(f'enb{i + 1}')
+    enb = rspec.RawPC('enb' + str(i + 1))
     enb.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
     enb.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/enb_setup.sh"))
     enb.hardware_type = params.Hardware
     enb.Site('RAN')
     iface1 = enb.addInterface()
-    iface1.addAddress(PG.IPv4Address(f'192.168.1.{i + 2}', netmask))
+    iface1.addAddress(PG.IPv4Address('192.168.1.' + str(i + 2), netmask))
     backhaul.addInterface(iface1)
     iface2 = enb1.addInterface()
-    iface2.addAddress(PG.IPv4Address(f'192.168.2.{i + 2}', netmask))
+    iface2.addAddress(PG.IPv4Address('192.168.2.' + str(i + 2), netmask))
     midhaul.addInterface(iface2)
 
 # eNB 1
