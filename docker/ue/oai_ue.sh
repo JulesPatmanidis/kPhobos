@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 1 ]; then
-    echo "USE: ./oai_ue.sh <UE ID>"
+if [ "$#" -ne 2 ]; then
+    echo "USE: ./oai_ue.sh <UE ID> <NUM ENBS>"
     exit 1
 fi
 
@@ -30,7 +30,7 @@ sed -i "s/CUSTOM_MSIN/$(printf "%010d" $1)/g" tmp_sim.conf # Add the MSIN
 rm tmp_sim.conf
 
 num="$(($1-1))"
-./lte-uesoftmodem -O ue.conf --L2-emul 5 --nokrnmod 1 --node-number 1 --num-enbs 2 --log_config.global_log_options level,nocolor,time,thread_id $num | tee ue.log 2>&1
+./lte-uesoftmodem -O ue.conf --L2-emul 5 --nokrnmod 1 --node-number 1 --num-enbs $2 --log_config.global_log_options level,nocolor,time,thread_id $num | tee ue.log 2>&1
 
 # node_id=2
 # sudo -E ./ran_build/build/lte-uesoftmodem -O ../ci-scripts/conf_files/episci/proxy_ue.nfapi.conf --L2-emul 5 \

@@ -87,32 +87,6 @@ for i in range(0, params.enbCount):
     iface2.addAddress(PG.IPv4Address('192.168.2.' + str(i + 2), netmask))
     midhaul.addInterface(iface2)
 
-# eNB 1
-# enb1 = rspec.RawPC("enb1")
-# enb1.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
-# enb1.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/enb_setup.sh"))
-# enb1.hardware_type = params.Hardware
-# enb1.Site('RAN')
-# iface1 = enb1.addInterface()
-# iface1.addAddress(PG.IPv4Address("192.168.1.2", netmask))
-# backhaul.addInterface(iface1)
-# iface2 = enb1.addInterface()
-# iface2.addAddress(PG.IPv4Address("192.168.2.2", netmask))
-# midhaul.addInterface(iface2)
-
-# # eNB 2
-# enb2 = rspec.RawPC("enb2")
-# enb2.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
-# enb2.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/enb_setup2.sh"))
-# enb2.hardware_type = params.Hardware
-# enb2.Site('RAN')
-# iface1 = enb2.addInterface()
-# iface1.addAddress(PG.IPv4Address("192.168.1.3", netmask))
-# backhaul.addInterface(iface1)
-# iface2 = enb2.addInterface()
-# iface2.addAddress(PG.IPv4Address("192.168.2.3", netmask))
-# midhaul.addInterface(iface2)
-
 
 # Proxy
 proxy = rspec.RawPC("proxy")
