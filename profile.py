@@ -73,7 +73,7 @@ iface = epc.addInterface()
 iface.addAddress(PG.IPv4Address("192.168.1.1", netmask))
 backhaul.addInterface(iface)
 
-
+# ENBs
 for i in range(0, params.enbCount):
     enb = rspec.RawPC('enb' + str(i + 1))
     enb.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
@@ -91,7 +91,7 @@ for i in range(0, params.enbCount):
 # Proxy
 proxy = rspec.RawPC("proxy")
 proxy.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
-proxy.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/proxy_setup.sh " + params.token))
+proxy.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/proxy_setup.sh " + params.token + " " + params.enbCount))
 proxy.hardware_type = params.Hardware
 proxy.Site('RAN')
 iface = proxy.addInterface()
@@ -114,7 +114,7 @@ fronthaul.addInterface(iface)
 kube_m.addService(PG.Execute(shell="bash", command="/local/repository/scripts/master.sh"))
 
 # Nervion Slaves
-for i in range(0,params.computeNodeCount):
+for i in range(0, params.computeNodeCount):
     kube_s = rspec.RawPC('slave'+str(i))
     kube_s.hardware_type = params.Hardware
     kube_s.routable_control_ip = True

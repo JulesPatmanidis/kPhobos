@@ -1,7 +1,7 @@
 #!/bin/bash
 
-if [ "$#" -ne 1 ]; then
-    echo "USE: sudo ./proxy_setup.sh <GitHub Token>"
+if [ "$#" -ne 2 ]; then
+    echo "USE: sudo ./proxy_setup.sh <Number of eNBs> <GitHub Token>"
     exit 1
 fi
 
@@ -18,7 +18,7 @@ sudo apt -y install libsctp-dev
 cd /local/repository
 
 # Clone proxy
-git clone https://JulesPatmanidis:$1@github.com/JulesPatmanidis/proxy-handover.git
+git clone https://JulesPatmanidis:$2@github.com/JulesPatmanidis/proxy-handover.git
 cd proxy-handover/
 
 # Compile proxy
@@ -26,5 +26,12 @@ make
 
 # Install byobu
 sudo apt install byobu
+
+# 
+filename=/local/repository/config/ran/enb_ips.conf
+> $filename
+for ((i=1;i<=$1;i++)); do
+    printf "192.168.1.%d\n" $(($i+1)) >> $filename
+done
 
 touch /local/repository/proxy-setup-complete
