@@ -5,7 +5,7 @@ if [ "$#" -ne 3 ]; then
     exit 1
 fi
 
-FILE=handover_table.txt
+FILE=handover_table.csv
 if test -f "$FILE";
 then
     echo "$FILE located"
