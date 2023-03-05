@@ -1,7 +1,16 @@
 #!/bin/bash
 
-if [ "$#" -ne 1 ]; then
-    echo "USE: ./oai_ue.sh <UE ID>"
+if [ "$#" -ne 3 ]; then
+    echo "USE: ./oai_ue.sh <UE ID> <NUM ENBS> <Start eNB>"
+    exit 1
+fi
+
+FILE=handover_table.csv
+if test -f "$FILE";
+then
+    echo "$FILE located"
+else
+    echo "$FILE does not exist, make sure to include it in the current directory"
     exit 1
 fi
 
@@ -20,5 +29,13 @@ sed -i "s/CUSTOM_MSIN/$(printf "%010d" $1)/g" tmp_sim.conf # Add the MSIN
 ../../../targets/bin/nvram -g -c tmp_sim.conf -o .
 rm tmp_sim.conf
 
-num="$(($1-1))"
-./lte-uesoftmodem -O ue.conf --L2-emul 5 --nokrnmod 1 --node-number 2 --log_config.global_log_options level,nocolor,time,thread_id $num | tee ue.log 2>&1
+id="$(($1-1))"
+num_enbs=$2
+start_enb="$(($3-1))"
+
+./lte-uesoftmodem -O ue.conf --L2-emul 5 --nokrnmod 1 --node-number 1 --num-enbs $num_enbs --log_config.global_log_options level,nocolor,time,thread_id $id $start_enb | tee ue.log 2>&1
+
+# node_id=2
+# sudo -E ./ran_build/build/lte-uesoftmodem -O ../ci-scripts/conf_files/episci/proxy_ue.nfapi.conf --L2-emul 5 \
+# --nokrnmod 1 --ue-idx-standalone $node_id --num-ues 1 --node-number $node_id --nsa \
+# --log_config.global_log_options level,nocolor,time,thread_id | tee ue_$node_id.log 2>&1

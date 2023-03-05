@@ -18,6 +18,8 @@ rspec = PG.Request()
 # Profile parameters.
 pc.defineParameter("computeNodeCount", "Number of Kubernetes nodes",
                    portal.ParameterType.INTEGER, 1)
+pc.defineParameter("enbCount", "Number of eNBs",
+                   portal.ParameterType.INTEGER, 1)
 pc.defineParameter("Hardware", "Node Hardware",
                    portal.ParameterType.STRING,"d430",[("d430","d430"),("d710","d710"), ("d820", "d820"), ("pc3000", "pc3000")])
 pc.defineParameter("Core", "Core Implementation",
@@ -32,8 +34,6 @@ params = pc.bindParameters()
 # warnings; this might sys.exit().
 #
 pc.verifyParameters()
-
-
 
 tour = IG.Tour()
 tour.Description(IG.Tour.TEXT,kube_description)
@@ -73,30 +73,29 @@ iface = epc.addInterface()
 iface.addAddress(PG.IPv4Address("192.168.1.1", netmask))
 backhaul.addInterface(iface)
 
-
-
-# eNB
-enb = rspec.RawPC("enb")
-enb.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
-enb.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/enb_setup.sh"))
-enb.hardware_type = params.Hardware
-enb.Site('RAN')
-iface1 = enb.addInterface()
-iface1.addAddress(PG.IPv4Address("192.168.1.2", netmask))
-backhaul.addInterface(iface1)
-iface2 = enb.addInterface()
-iface2.addAddress(PG.IPv4Address("192.168.2.1", netmask))
-midhaul.addInterface(iface2)
+# ENBs
+for i in range(0, params.enbCount):
+    enb = rspec.RawPC('enb' + str(i + 1))
+    enb.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
+    enb.addService(PG.Execute(shell="sh", command=("/usr/bin/sudo /local/repository/scripts/ran/enb_setup.sh " + str(i))))
+    enb.hardware_type = params.Hardware
+    enb.Site('RAN')
+    iface1 = enb.addInterface()
+    iface1.addAddress(PG.IPv4Address('192.168.1.' + str(i + 2), netmask))
+    backhaul.addInterface(iface1)
+    iface2 = enb.addInterface()
+    iface2.addAddress(PG.IPv4Address('192.168.2.' + str(i + 2), netmask))
+    midhaul.addInterface(iface2)
 
 
 # Proxy
 proxy = rspec.RawPC("proxy")
 proxy.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
-proxy.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/proxy_setup.sh " + params.token))
+proxy.addService(PG.Execute(shell="sh", command="/usr/bin/sudo /local/repository/scripts/ran/proxy_setup.sh " + params.token + " " + params.enbCount))
 proxy.hardware_type = params.Hardware
 proxy.Site('RAN')
 iface = proxy.addInterface()
-iface.addAddress(PG.IPv4Address("192.168.2.2", netmask))
+iface.addAddress(PG.IPv4Address("192.168.2.1", netmask))
 midhaul.addInterface(iface)
 iface2 = proxy.addInterface()
 iface2.addAddress(PG.IPv4Address("192.168.3.1", netmask))
@@ -115,7 +114,7 @@ fronthaul.addInterface(iface)
 kube_m.addService(PG.Execute(shell="bash", command="/local/repository/scripts/master.sh"))
 
 # Nervion Slaves
-for i in range(0,params.computeNodeCount):
+for i in range(0, params.computeNodeCount):
     kube_s = rspec.RawPC('slave'+str(i))
     kube_s.hardware_type = params.Hardware
     kube_s.routable_control_ip = True

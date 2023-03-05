@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ "$#" -ne 1 ]; then
+    echo "USE: sudo ./enb_setup.sh <enb_id>"
+    exit 1
+fi
 
 if [ -f /local/repository/enb-setup-complete ]; then
     echo "eNB setup already ran; not running again"
@@ -22,14 +26,31 @@ cd cmake_targets/
 sudo ./build_oai -I
 sudo ./build_oai --eNB
 
-# eNB config
-# Backhaul
-BACKHAUL_IFACE=$(ip route list 192.168.1.2/24 | awk '{print $3}')
-sed -i "s/BACKHAUL_IFACE/$BACKHAUL_IFACE/g" /local/repository/config/ran/enb.conf
 
-# Fronthaul
-FRONTHAUL_IFACE=$(ip route list 192.168.2.1/24 | awk '{print $3}')
-sed -i "s/FRONTHAUL_IFACE/$FRONTHAUL_IFACE/g" /local/repository/config/ran/enb.conf
+# IDs
+sed -i "s/ENB_ID_HEX/0xe0$1/" /local/repository/config/ran/enb.conf # ONLY WORKS FOR < 10 ENBs
+sed -i "s/NID_CELL_ID/$1/" /local/repository/config/ran/enb.conf
+
+# Ports
+PORT_OFFSET=$(($1 * 2))
+sed -i "s/500\(..\)/50$PORT_OFFSET\1/g" /local/repository/config/ran/enb.conf
+
+# IPs
+IP_OFFSET=$(($1+2))
+
+BACKHAUL_IFACE=$(ip route list 192.168.1.0/24 | awk '{print $3}')
+ENB_BACKHAUL_IP="192.168.1.$IP_OFFSET"
+
+sed -i "s/BACKHAUL_IFACE/$BACKHAUL_IFACE/g" /local/repository/config/ran/enb.conf
+sed -i "s/ENB_BACKHAUL_IP/$ENB_BACKHAUL_IP/g" /local/repository/config/ran/enb.conf
+
+MIDHAUL_IFACE=$(ip route list 192.168.2.0/24 | awk '{print $3}')
+ENB_MIDHAUL_IP="192.168.2.$IP_OFFSET"
+
+sed -i "s/MIDHAUL_IFACE/$MIDHAUL_IFACE/g" /local/repository/config/ran/enb.conf
+sed -i "s/ENB_MIDHAUL_IP/$ENB_MIDHAUL_IP/g" /local/repository/config/ran/enb.conf
+
+# TODO: Add x2 configuration
 
 # Install byobu
 sudo apt install byobu

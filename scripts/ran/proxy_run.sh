@@ -10,6 +10,9 @@ if [ ! -f /local/repository/proxy-setup-complete ]; then
     exit 0
 fi
 
-cd /local/repository/oai-lte-5g-proxy-ioulios/build
+cd /local/repository/proxy-handover/build
 
-sudo -E ./proxy $1 192.168.2.1 192.168.3.1 192.168.2.2
+
+# ./proxy --lte_handover_n_enb [path to enb ips file] [num_UEs] [proxy_ip]
+#sudo -E ./proxy --lte_handover $1 192.168.2.1 192.168.2.3 192.168.3.1 192.168.2.2
+sudo -E ./proxy --lte_handover_n_enb /local/repository/config/ran/enb_ips.conf $1 192.168.3.1 | tee eNB.log 2>&1
