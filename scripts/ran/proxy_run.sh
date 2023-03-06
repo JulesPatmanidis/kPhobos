@@ -15,4 +15,4 @@ cd /local/repository/proxy-handover/build
 
 # ./proxy --lte_handover_n_enb [path to enb ips file] [num_UEs] [proxy_ip]
 #sudo -E ./proxy --lte_handover $1 192.168.2.1 192.168.2.3 192.168.3.1 192.168.2.2
-sudo -E ./proxy --lte_handover_n_enb /local/repository/config/ran/enb_ips.conf $1 192.168.3.1 | tee eNB.log 2>&1
+sudo -E ./proxy --lte_handover_n_enb /local/repository/config/ran/enb_ips.conf $1 192.168.3.1 | tee proxy.log 2>&1
