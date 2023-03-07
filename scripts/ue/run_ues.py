@@ -5,14 +5,17 @@ import time
 import concurrent.futures
 from multiprocessing import Process
 
+ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
+FILES_DIR = os.path.join(ROOT_DIR, 'files')
 
 def send_ue_files(num_ues):
     for i in range(1, num_ues + 1):
-        if ( not os.path.isfile(f'files/mobility_file_ue{i}')):
-            print(f'files/mobility_file_ue{i} does not exist, skipping')
+        filename = os.path.join(FILES_DIR, f'mobility_file_ue{i}.csv')
+        if ( not os.path.isfile(filename)):
+            print(f"{filename} does not exist, skipping")
             continue
 
-        command = f'kubectl cp files/mobility_file_ue{i} ue{i}:/openairinterface5g/cmake_targets/ran_build/build/'
+        command = f'kubectl cp {filename} ue{i}:/openairinterface5g/cmake_targets/ran_build/build/handover_table.csv'
         try:
             process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output, error = process.communicate()
@@ -31,41 +34,44 @@ def send_ue_files(num_ues):
 def get_ue_params(num_ues):
     params = []
     for i in range(1, num_ues + 1):
-        if (not os.path.isfile(f'mobility_file_ue{i}')):
-            print(f'mobility_file_ue{i} does not exist, skipping')
+        filename = os.path.join(FILES_DIR, f'mobility_file_ue{i}.csv')
+        print(os.path.isfile(filename))
+        if (not os.path.isfile(filename)):
+            print(f'{filename} does not exist, skipping')
             continue
         source = '0'
         target = '0'
-        with open(f'mobility_file_ue{i}', 'r') as f:
+        with open(filename, 'r') as f:
             source = f.readline().strip().split(',')[0]
             target = f.readline().strip().split(',')[0]
             if not target:
                 target = '0'
             
             params.append((source, target))
+    print(params)
     return params
 
 def run_ues(num_enbs, ue_params):
     for i, (source, target) in enumerate(ue_params):
-        command = f'kubectl exec ue{i + 1} -- /openairinterface5g/cmake_targets/ran_build/build/oai_ue.sh {i + 1} {num_enbs} {source}'
+        command = f'kubectl exec ue{i + 1} -- /openairinterface5g/cmake_targets/ran_build/build/oai_ue.sh {i + 1} {num_enbs} {str(int(source) + 1)}'
         print(command)
-        # try:
-        #     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        #     output, error = process.communicate()
-        #     if process.returncode != 0:
-        #         print(f'Error executing command: {command}\n{error.decode()}')
-        #         pass
-        #     else:
-        #         print(f'Success executing command: {command}\n{output.decode()}')
-        #         pass
-        # except Exception as e:
-        #     pass
-        #     print(f'Error executing command: {command}\n{e}')
-        # pass
+        try:
+            process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output, error = process.communicate()
+            if process.returncode != 0:
+                print(f'Error executing command: {command}\n{error.decode()}')
+                pass
+            else:
+                print(f'Success executing command: {command}\n{output.decode()}')
+                pass
+        except Exception as e:
+            pass
+            print(f'Error executing command: {command}\n{e}')
+        pass
     pass
 
-def execute_traffic_commands(file_name):
-    with open(file_name, 'r') as file:
+def execute_traffic_commands():
+    with open(os.path.join(FILES_DIR, 'traffic_scenario.txt'), 'r') as file:
         lines = file.readlines()
         command_lists = []
         for line in lines:
@@ -98,34 +104,44 @@ def execute_commands(commands):
     index = 0
     while (index < len(commands)):
         current_time = time.time()
-        id, delay, command = commands[index]
+        ue_id, delay, command = commands[index]
+        kube_cmd = f'kubectl exec ue{ue_id} -- {command}'
+        
         if (start_time + delay > current_time):
             continue
         else:
+            print(kube_cmd)
             #print(current_time - start_time)
             try:
-                process = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process = subprocess.Popen(kube_cmd.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 if (index + 1 < len(commands)):
                     max_duration = commands[index + 1][1] - delay
-                    #print(f'Timeout is: {max_duration - 1}s')
-                    output, error = process.communicate(timeout=max_duration)
+                    print(f'Timeout is: {max_duration - 1}s')
+                    time.sleep(max_duration - 1)
+                    output, error = subprocess.Popen(f'kubectl exec ue{ue_id} -- pkill -9 -f iperf'.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+                    o ,e = process.communicate()
                 else:
                     pass
-                    output, error = process.communicate(timeout=30)
-                if process.returncode != 0:
-                    #print(f'Error executing command: {command}\n{error.decode()}')
+                    print(f'Last traffic command for ue {ue_id}')
+                    output, error = process.communicate()
+                if process.returncode == 137: # SIGKILL code
+                    print(f'Command killed successfully: {command}')
+                    pass
+                elif process.returncode != 0:
+                    print(process.returncode)
+                    print(f'Error executing command: {command}\n{error.decode()}')
                     pass
                 else:
-                    #print(f'Success executing command: {command}\n{output.decode()}')
+                    print(f'Success executing command: {command}\n{output.decode()}')
                     pass
             except Exception as e:
                 pass
-                #print(f'Error executing command: {command}\n{e}')
+                print(f'Error executing command e: {command}\n{e}')
             index += 1
 
 def main():
     if (len(sys.argv) != 3):
-        print('Wrong number of arguments')
+        print('Use: python3 run_ues.py <num_ues> <num_enbs>')
         exit()
 
     num_ues = int(sys.argv[1])
@@ -137,13 +153,15 @@ def main():
     # Run
     ue_params = get_ue_params(num_ues)
     ues_process = Process(target=lambda: run_ues(num_enbs, ue_params))
-    ues_process.start()
+    #ues_process.start()
     print('Ue run thread is running...')
 
     # Traffic
-    traffic_process = Process(target=lambda: execute_traffic_commands('files/traffic_scenario.txt'))
-    traffic_process.start()
+    traffic_process = Process(target=lambda: execute_traffic_commands())
+    #traffic_process.start()
     print('Traffic thread is running...')
+
+
 
 if __name__ == "__main__":
     main()
