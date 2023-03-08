@@ -2,6 +2,18 @@ db_uri: mongodb://localhost/open5gs
 
 logger:
 
+sbi:
+    server:
+      no_tls: true
+      cacert: /local/repository/open5gs/build/configs/open5gs/tls/ca.crt
+      key: /local/repository/open5gs/build/configs/open5gs/tls/testserver.key
+      cert: /local/repository/open5gs/build/configs/open5gs/tls/testserver.crt
+    client:
+      no_tls: true
+      cacert: /local/repository/open5gs/build/configs/open5gs/tls/ca.crt
+      key: /local/repository/open5gs/build/configs/open5gs/tls/testclient.key
+      cert: /local/repository/open5gs/build/configs/open5gs/tls/testclient.crt
+
 parameter:
     use_openair: true
 #    no_nrf: true

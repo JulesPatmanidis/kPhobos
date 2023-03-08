@@ -52,6 +52,8 @@ sed -i "s/ENB_MIDHAUL_IP/$ENB_MIDHAUL_IP/g" /local/repository/config/ran/enb.con
 
 # TODO: Add x2 configuration
 
+
+
 # Install byobu
 sudo apt install byobu
 
