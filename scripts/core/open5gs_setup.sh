@@ -36,3 +36,6 @@ done
 sudo apt install byobu 
 touch /local/repository/core-ready
 touch /local/repository/open5gs-setup-complete
+
+# Install iperf3
+sudo apt -y install iperf3

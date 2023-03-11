@@ -19,19 +19,15 @@ RUN apt-get update && \
        xxd \
        #unzip is needed for protobuf
        unzip \
+       iperf3 \
        # python3-pip for conf template generation
        python3-pip && \
     pip3 install --ignore-installed pyyaml
 
 ARG token
 RUN git clone https://JulesPatmanidis:$token@github.com/JulesPatmanidis/openairinterface5g.git
-#RUN git clone https://JulesPatmanidis:$token@github.com/JulesPatmanidis/openairinterface5g-IP.git
-#RUN git clone https://j0lama:$token@github.com/j0lama/openairinterface5g.git
 
-#WORKDIR openairinterface5g-IP/
-WORKDIR openairinterface5g/
-#RUN source oaienv
-WORKDIR cmake_targets/
+WORKDIR openairinterface5g/cmake_targets
 
 # Build OAI UE
 RUN ["chmod", "+x", "build_oai"]
@@ -42,14 +38,9 @@ RUN /bin/sh oaienv && \
     git pull && \
     ./build_oai -I --UE
 
-#RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC ./build_oai -I
-#RUN ./build_oai --UE
-
-
-# Configure eNB // UE?
-
 WORKDIR cmake_targets/ran_build/build/
 COPY ue.conf .
 COPY sim.conf .
 COPY oai_ue.sh .
 COPY execute_ue.sh .
+COPY start_ues.py .
