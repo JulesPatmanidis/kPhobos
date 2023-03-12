@@ -132,12 +132,12 @@ def main():
 
     ue_id = int(sys.argv[1])
     num_enbs = int(sys.argv[2])
-    print(ue_id)
-    #fetch_files(ue_id)
+    
+    fetch_files(ue_id)
 
     # Run
     ue_process = Process(target=lambda: run_ue(num_enbs, ue_id))
-    #ue_process.start()
+    ue_process.start()
     print('Ue run thread is running...')
 
     print('Waiting for oai interface to be set up...')
@@ -147,7 +147,7 @@ def main():
     # Traffic
     traffic_commands = parse_traffic_commands(ue_id)
     traffic_process = Process(target=lambda: execute_traffic_commands(traffic_commands))
-    #traffic_process.start()
+    traffic_process.start()
     print('Traffic thread is running...')
 
 

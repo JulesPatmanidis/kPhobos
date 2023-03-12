@@ -50,8 +50,16 @@ ENB_MIDHAUL_IP="192.168.2.$IP_OFFSET"
 sed -i "s/MIDHAUL_IFACE/$MIDHAUL_IFACE/g" /local/repository/config/ran/enb.conf
 sed -i "s/ENB_MIDHAUL_IP/$ENB_MIDHAUL_IP/g" /local/repository/config/ran/enb.conf
 
-# TODO: Add x2 configuration
-
+# X2 configuration
+for ((i=1;i<$(($1+1));i++)); do
+    if [ $i -eq $1 ]
+    then
+        str="{ipv4 = \"192.168.1.$i\";ipv6 = \"192:168:30::17\";preference = \"ipv4\";}"
+    else
+        str="{ipv4 = \"192.168.1.$i\";ipv6 = \"192:168:30::17\";preference = \"ipv4\";},"
+    fi
+    sed -i "s|//x2_conf_$i|$str|g" /local/repository/config/enb.conf
+done
 
 
 # Install byobu

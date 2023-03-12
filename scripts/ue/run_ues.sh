@@ -5,7 +5,7 @@ if [ "$#" -ne 2 ]; then
     exit 1
 fi
 
-helm upgrade -i \
+helm install \
     --set-string num_ues=$1 \
     --set-string num_enbs="$2" \
-    ues .
+    ues /local/repository/scripts/ue/
