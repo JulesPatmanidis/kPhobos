@@ -18,8 +18,12 @@ sudo apt -y install libsctp-dev
 cd /local/repository
 
 # Clone proxy
-git clone https://JulesPatmanidis:$2@github.com/JulesPatmanidis/proxy-handover.git
-cd proxy-handover/
+#git clone https://JulesPatmanidis:$2@github.com/JulesPatmanidis/proxy-handover.git
+#cd proxy-handover/
+
+git clone https://github.com/andrewferguson/phobos-proxy.git
+cd phobos-proxy
+git checkout target_from_discovery_feature
 
 # Compile proxy
 make

@@ -13,11 +13,14 @@ fi
 cd /local/repository
 
 # Clone repository
-git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git
+#git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git
+git clone https://github.com/andrewferguson/openairinterface-nfapi-netsys.git
 
-cd openairinterface5g/
+#cd openairinterface5g/
+cd openairinterface-nfapi-netsys
 # Change branch
-git checkout episys-lte-handover
+#git checkout episys-lte-handover
+git checkout episys-lte-handover_phyid-hardcoding
 # git checkout develop
 source oaienv
 cd cmake_targets/
