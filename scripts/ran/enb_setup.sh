@@ -58,7 +58,7 @@ for ((i=1;i<$(($1+1));i++)); do
     else
         str="{ipv4 = \"192.168.1.$i\";ipv6 = \"192:168:30::17\";preference = \"ipv4\";},"
     fi
-    sed -i "s|//x2_conf_$i|$str|g" /local/repository/config/enb.conf
+    sed -i "s|//x2_conf_$i|$str|g" /local/repository/config/ran/enb.conf
 done
 
 
