@@ -5,7 +5,7 @@ if [ ! -f /local/repository/enb-setup-complete ]; then
     exit 0
 fi
 
-cd /local/repository/openairinterface5g/
+cd /local/repository/openairinterface-nfapi-netsys/
 source oaienv
 cd cmake_targets/
 

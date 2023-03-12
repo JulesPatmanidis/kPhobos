@@ -21,7 +21,7 @@ cd /local/repository
 #git clone https://JulesPatmanidis:$2@github.com/JulesPatmanidis/proxy-handover.git
 #cd proxy-handover/
 
-git clone https://github.com/andrewferguson/phobos-proxy.git
+git clone https://JulesPatmanidis:$2@github.com/andrewferguson/phobos-proxy.git
 cd phobos-proxy
 git checkout target_from_discovery_feature
 

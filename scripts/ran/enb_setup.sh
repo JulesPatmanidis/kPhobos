@@ -1,6 +1,6 @@
 #!/bin/bash
-if [ "$#" -ne 1 ]; then
-    echo "USE: sudo ./enb_setup.sh <enb_id>"
+if [ "$#" -ne 2 ]; then
+    echo "USE: sudo ./enb_setup.sh <enb_id> <GitHub Token>"
     exit 1
 fi
 
@@ -14,7 +14,7 @@ cd /local/repository
 
 # Clone repository
 #git clone https://gitlab.eurecom.fr/oai/openairinterface5g.git
-git clone https://github.com/andrewferguson/openairinterface-nfapi-netsys.git
+git clone https://JulesPatmanidis:$2@github.com/andrewferguson/openairinterface-nfapi-netsys.git
 
 #cd openairinterface5g/
 cd openairinterface-nfapi-netsys
@@ -57,9 +57,9 @@ sed -i "s/ENB_MIDHAUL_IP/$ENB_MIDHAUL_IP/g" /local/repository/config/ran/enb.con
 for ((i=1;i<$(($1+1));i++)); do
     if [ $i -eq $1 ]
     then
-        str="{ipv4 = \"192.168.1.$i\";ipv6 = \"192:168:30::17\";preference = \"ipv4\";}"
+        str="{ipv4 = \"192.168.1.$(($i+1))\";ipv6 = \"192:168:30::17\";preference = \"ipv4\";}"
     else
-        str="{ipv4 = \"192.168.1.$i\";ipv6 = \"192:168:30::17\";preference = \"ipv4\";},"
+        str="{ipv4 = \"192.168.1.$(($i+1))\";ipv6 = \"192:168:30::17\";preference = \"ipv4\";},"
     fi
     sed -i "s|//x2_conf_$i|$str|g" /local/repository/config/ran/enb.conf
 done

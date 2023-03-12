@@ -10,7 +10,7 @@ if [ ! -f /local/repository/proxy-setup-complete ]; then
     exit 0
 fi
 
-cd /local/repository/proxy-handover/build
+cd /local/repository/phobos-proxy/build
 
 
 # ./proxy --lte_handover_n_enb [path to enb ips file] [num_UEs] [proxy_ip]

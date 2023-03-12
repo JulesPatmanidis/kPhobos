@@ -77,7 +77,7 @@ backhaul.addInterface(iface)
 for i in range(0, params.enbCount):
     enb = rspec.RawPC('enb' + str(i + 1))
     enb.disk_image = 'urn:publicid:IDN+emulab.net+image+emulab-ops:UBUNTU18-64-STD'
-    enb.addService(PG.Execute(shell="sh", command=("/usr/bin/sudo /local/repository/scripts/ran/enb_setup.sh " + str(i))))
+    enb.addService(PG.Execute(shell="sh", command=("/usr/bin/sudo /local/repository/scripts/ran/enb_setup.sh " + str(i) + " " + str(params.token))))
     enb.hardware_type = params.Hardware
     enb.Site('RAN')
     iface1 = enb.addInterface()
