@@ -5,6 +5,8 @@ import time
 import concurrent.futures
 from multiprocessing import Process
 
+MOBILITY_FILE = 'mobility_scenario.txt'
+TRAFFIC_FILE = 'traffic_scenario.txt'
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 FILES_DIR = os.path.join(ROOT_DIR, 'files')
 
@@ -28,15 +30,41 @@ FILES_DIR = os.path.join(ROOT_DIR, 'files')
 #     return handovers
 
 def fetch_files(ue_id):
-    command = f'wget -cO - http://10.10.0.1:8000/mobility_file_ue{ue_id}.csv > handover_table.csv'
+    command = f'wget http://10.10.0.1:8000/{MOBILITY_FILE}'
     print(command)
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = process.communicate()
 
-    command = f'wget http://10.10.0.1:8000/traffic_scenario.txt'
+    command = f'wget http://10.10.0.1:8000/{TRAFFIC_FILE}'
     print(command)
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = process.communicate()
+
+
+def generate_handover_table(ue_id):
+        #files = [[] for _ in range(self.num_ues)]
+        lines = []
+        with open(os.path.join(ROOT_DIR, MOBILITY_FILE), 'r') as f:
+            while True:
+                raw_line = f.readline()
+                if not raw_line:
+                    break
+
+                actions = raw_line.strip().split('|')  # Remove control characters and split
+                start = actions[0].replace('UE', '').replace('eNB', '').split('-')
+                assert start[0].isnumeric()
+                ue_id_tmp = int(start[0])
+                if ue_id_tmp != ue_id:
+                    continue
+
+                lines.append(f'{int(start[2]) - 1},0')
+                for handover in actions[1:]:
+                    data = handover.replace('HO-eNB', '').split('-')
+                    lines.append(f'{int(data[0]) - 1},{data[1]}')
+
+        with open(os.path.join(ROOT_DIR, f'handover_table.csv'), 'w') as tmp_f:
+            for line in lines:
+                tmp_f.write(f'{line}\n')
 
 
 def run_ue(num_enbs, ue_id):
@@ -134,6 +162,7 @@ def main():
     num_enbs = int(sys.argv[2])
     
     fetch_files(ue_id)
+    generate_handover_table(ue_id)
 
     # Run
     ue_process = Process(target=lambda: run_ue(num_enbs, ue_id))
