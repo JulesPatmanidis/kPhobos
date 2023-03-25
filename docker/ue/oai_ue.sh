@@ -36,6 +36,7 @@ then
     num_enbs=2
 else
     num_enbs=1
+fi
 
 ./lte-uesoftmodem -O ue.conf --L2-emul 5 --nokrnmod 1 --node-number 1 --num-enbs $num_enbs --log_config.global_log_options level,nocolor,time,thread_id $id $3 | tee ue.log 2>&1
 

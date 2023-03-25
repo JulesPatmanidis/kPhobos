@@ -34,8 +34,13 @@ done
 
 # Install byobu
 sudo apt install byobu 
+
 touch /local/repository/core-ready
 touch /local/repository/open5gs-setup-complete
 
 # Install iperf3
 sudo apt -y install iperf3
+#python3 -m pip install iperf3
+
+#create log folder
+mkdir /local/repository/scripts/core/logs

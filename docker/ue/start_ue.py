@@ -4,32 +4,15 @@ import subprocess
 import time
 import concurrent.futures
 from multiprocessing import Process
+import re
 
 MOBILITY_FILE = 'mobility_scenario.txt'
 TRAFFIC_FILE = 'traffic_scenario.txt'
 ROOT_DIR = os.path.abspath(os.path.dirname(__file__))
 FILES_DIR = os.path.join(ROOT_DIR, 'files')
 
-# def parse_mobility(ue_id):
-#     handovers = []
-#     filename = os.path.join(FILES_DIR, f'handover_table.csv')
-#     print(os.path.isfile(filename))
-#     if (not os.path.isfile(filename)):
-#         print(f'{filename} does not exist, skipping')
-#         return []
-#     start = '0'
-#     first_target = '0'
-#     with open(filename, 'r') as f:
-#         start = f.readline().strip().split(',')[0]
-#         first_target = f.readline().strip().split(',')[0]
-#         if not first_target:
-#             first_target = '0'
-        
-#         handovers.append((start, first_target))
-#     print(handovers)
-#     return handovers
 
-def fetch_files(ue_id):
+def fetch_files():
     command = f'wget http://10.10.0.1:8000/{MOBILITY_FILE}'
     print(command)
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -41,8 +24,9 @@ def fetch_files(ue_id):
     output, error = process.communicate()
 
 
-def generate_handover_table(ue_id):
+def generate_handover_table(ue_id) -> int:
         #files = [[] for _ in range(self.num_ues)]
+        num_enbs = 1
         lines = []
         with open(os.path.join(ROOT_DIR, MOBILITY_FILE), 'r') as f:
             while True:
@@ -59,17 +43,28 @@ def generate_handover_table(ue_id):
 
                 lines.append(f'{int(start[2]) - 1},0')
                 for handover in actions[1:]:
+                    if handover == '':
+                        continue
                     data = handover.replace('HO-eNB', '').split('-')
                     lines.append(f'{int(data[0]) - 1},{data[1]}')
+                
+                # Hack until proxy is fixed
+                if len(lines) > 1:
+                    fake_target = lines[-2].split(',')[0]
+                    lines.append(f'{fake_target},1000000')
 
         with open(os.path.join(ROOT_DIR, f'handover_table.csv'), 'w') as tmp_f:
             for line in lines:
                 tmp_f.write(f'{line}\n')
+            
+        if len(lines) > 1:
+            num_enbs = 2
 
+        return num_enbs
 
 def run_ue(num_enbs, ue_id):
     
-    command = f'/openairinterface5g/cmake_targets/ran_build/build/oai_ue.sh  {ue_id} {num_enbs} handover_table.csv'
+    command = f'/openairinterface5g/cmake_targets/ran_build/build/oai_ue.sh {ue_id} {num_enbs} handover_table.csv'
     print(command)
     try:
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -109,7 +104,7 @@ def parse_traffic_commands(ue_id):
 def execute_traffic_commands(commands):
     start_time = time.time()
     index = 0
-    kill_cmd = 'pkill -2 -f iperf'.split(' ') # Send SIGINT signal
+    kill_cmd = 'pkill -2 -f iperf'.split(' ')
     while (index < len(commands)):
         current_time = time.time()
         command, delay = commands[index]
@@ -119,29 +114,17 @@ def execute_traffic_commands(commands):
         else:
             #print(current_time - start_time)
             try:
-                process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                process = subprocess.Popen(command, shell=True)
                 if (index + 1 < len(commands)):
                     max_duration = commands[index + 1][1] - delay
                     print(f'Timeout is: {max_duration - 1}s')
                     time.sleep(max_duration - 1)
-                    output, error = subprocess.Popen(kill_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-                    o ,e = process.communicate()
+                    output, error = subprocess.Popen(kill_cmd).communicate()
+                    process.wait()
                 else:
-                    pass
                     print(f'Last traffic command')
-                    output, error = process.communicate()
-                if process.returncode == 137: # SIGKILL code
-                    print(f'Command killed successfully: {command}')
-                    pass
-                elif process.returncode != 0:
-                    print(process.returncode)
-                    print(f'Error executing command: {command}\n{error.decode()}')
-                    pass
-                else:
-                    print(f'Success executing command: {command}\n{output.decode()}')
-                    pass
+                    process.wait()
             except Exception as e:
-                pass
                 print(f'Error executing command e: {command}\n{e}')
             index += 1
 
@@ -154,15 +137,14 @@ def is_interface_up(interface):
 
 
 def main():
-    if (len(sys.argv) != 3):
-        print('Use: python3 run_ues.py <ue_id> <num_enbs>')
+    if (len(sys.argv) != 2):
+        print('Use: python3 run_ues.py <ue_id>')
         exit()
 
     ue_id = int(sys.argv[1])
-    num_enbs = int(sys.argv[2])
     
-    fetch_files(ue_id)
-    generate_handover_table(ue_id)
+    fetch_files()
+    num_enbs = generate_handover_table(ue_id)
 
     # Run
     ue_process = Process(target=lambda: run_ue(num_enbs, ue_id))

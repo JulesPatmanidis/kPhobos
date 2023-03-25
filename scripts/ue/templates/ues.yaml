@@ -18,6 +18,7 @@ spec:
           image: iouliosp/oaiue:latest
           imagePullPolicy: Always
           command: ["/bin/sh", "-c"]
-          args: ["python3 start_ues.py $((${HOSTNAME##*-} + 1)) {{ .Values.num_enbs }} &> start_ues.log & ping 8.8.8.8"]
+          # args: ["ping 8.8.8.8"]
+          args: ["python3 start_ues.py $((${HOSTNAME##*-} + 1)) &> start_ues.log"]
           securityContext:
             privileged: true

@@ -146,6 +146,9 @@ sudo kubectl create -f config/deployment.yaml
 # Log all the traffic on the Nervion master node
 #sudo tcpdump -i any -w ~/tcpdump.pcap &
 
+# sudo apt-get -y install python-pip3
+# python3 -m pip3 install --user uploadserver
+
 # to know how much time it takes to instantiate everything.
 echo "Setup DONE!"
 date
