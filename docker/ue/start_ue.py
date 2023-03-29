@@ -67,14 +67,7 @@ def run_ue(num_enbs, ue_id):
     command = f'/openairinterface5g/cmake_targets/ran_build/build/oai_ue.sh {ue_id} {num_enbs} handover_table.csv'
     print(command)
     try:
-        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output, error = process.communicate()
-        if process.returncode != 0:
-            print(f'Error executing command: {command}\n{error.decode()}')
-            pass
-        else:
-            print(f'Success executing command: {command}\n{output.decode()}')
-            pass
+        subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL)
     except Exception as e:
         pass
         print(f'Error executing command: {command}\n{e}')
@@ -147,8 +140,8 @@ def main():
     num_enbs = generate_handover_table(ue_id)
 
     # Run
-    ue_process = Process(target=lambda: run_ue(num_enbs, ue_id))
-    ue_process.start()
+    run_ue(num_enbs, ue_id)
+
     print('Ue run thread is running...')
 
     print('Waiting for oai interface to be set up...')
